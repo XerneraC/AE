@@ -1,5 +1,5 @@
 package main
-
+// This file includes the functions involved in generating moves
 
 
 
@@ -7,35 +7,35 @@ var NonPawnMoveOffsets = []Square{
 	// Rook
 	// Queen
 	// King
-	{ 1,  0},
-	{ 0,  1},
-	{-1,  0},
-	{ 0, -1},
+	{+1, +0},
+	{+0, +1},
+	{-1, -0},
+	{-0, -1},
 
 	// Bishop
 	// Queen
 	// King
-	{ 1,  1},
-	{ 1, -1},
+	{+1, +1},
+	{+1, -1},
 	{-1, -1},
-	{-1,  1},
+	{-1, +1},
 
 	// Knight
-	{ 2,  1},
-	{ 2, -1},
+	{+2, +1},
+	{+2, -1},
 	{-2, -1},
-	{-2,  1},
-	{ 1,  2},
-	{ 1, -2},
+	{-2, +1},
+	{+1, +2},
+	{+1, -2},
 	{-1, -2},
-	{-1,  2},
+	{-1, +2},
 }
 
-// TODO: change these functions, so that they append the moves to a passed slice instead of creating their own (since concatenating 2 slices is expensive)
+// TODO: Change these functions, so that they append the moves to a passed slice instead of creating their own (since concatenating 2 slices is expensive)
 // TODO: Implement castling
 // TODO: Implement En Passant
 // TODO: Implement Promotion
-// TODO: Always check for checks (only allow moves that would not result in a check)
+// TODO: Always check for checks!!! (only allow moves that would not result in a check)
 
 func generate_non_pawn_moves(state State, from Square) []Move {
 	piece := type_of(state.board[square_index(from)])
@@ -112,12 +112,14 @@ func generate_pawn_moves(state State, from Square) []Move {
 	}
 
 	for _, sq := range walks {
+		if !square_legal(sq) { break }
 		if state.board[square_index(sq)] != NoPiece { break }
 		moves = append(moves, Move{from, sq})
 		if !((from.rank == 1) || (from.rank == 6)) { break }
 	}
 	for _, sq := range captures {
-		if color_of(state.board[square_index(sq)]) != opposite_color(state.turnToMove) { break }
+		if !square_legal(sq) { continue }
+		if color_of(state.board[square_index(sq)]) != opposite_color(state.turnToMove) { continue }
 		moves = append(moves, Move{from, sq})
 	}
 	return moves
@@ -148,3 +150,4 @@ func generate_all_possible_moves(state State) []Move {
 	}
 	return moves
 }
+

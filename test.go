@@ -1,8 +1,8 @@
 package main
+// This is a test file that test the current state of the Engine
+// Nothing here is intended to still be around once the engine is finished (though some parts might be lifted into permanent files later on)
 
 import "fmt"
-
-
 
 
 var asld = map[Piece]rune{
@@ -24,6 +24,10 @@ func printBoard(state State) {
 		}
 		fmt.Print("\n")
 	}
+}
+
+func printMove(mv Move) string {
+	return square_to_coordinate(mv.from) + square_to_coordinate(mv.to)
 }
 
 func visualize_moves(state State, moves []Move) {
@@ -48,15 +52,36 @@ func visualize_moves(state State, moves []Move) {
 }
 
 
+func self_play() {
+	var board State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+	printBoard(board)
+	for i := 0; i <20; i++ {
+
+		fmt.Print("\n")
+		fmt.Println("thinking...")
+		mv, v := bestMove(board, 1)
+		fmt.Println(printMove(mv))
+
+		play_move_on(&board, mv)
+		printBoard(board)
+		fmt.Println(v)
+	}
+}
+
 
 
 func main() {
-	var a State = load_fen("8/8/5K1k/8/6R1/7P/8/8 w - - 5 85")
-	//var a State = load_fen("rnbqkbnr/pppppppp/8/8/3R4/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+	/*
+	//var a State = load_fen("8/8/5K1k/8/6R1/7P/8/8 w - - 5 85")
+	var a State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 	printBoard(a)
 	//moves := generate_non_pawn_moves(a, Square{3, 3})
-	moves := generate_all_possible_moves(a)
 	fmt.Print("\n")
-	visualize_moves(a, moves)
-	fmt.Println(moves)
+	fmt.Println("thinking...")
+	mv, v := bestMove(a, 6)
+	fmt.Println(printMove(mv))
+	fmt.Println(v)
+
+	 */
+	self_play()
 }

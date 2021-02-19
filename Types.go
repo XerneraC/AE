@@ -1,4 +1,5 @@
 package main
+// This file includes all the basic types that are used in this package
 
 
 type PieceType int8; const (
@@ -60,6 +61,13 @@ func type_of(piece Piece) PieceType {
 // to be inlined
 func make_piece(pieceType PieceType, color Color) Piece {
 	return Piece(color) | Piece(pieceType)
+}
+
+// to be inlined
+func seperate(piece Piece) (PieceType, Color) {
+	pieceType := type_of(piece)
+	pieceColor := color_of(piece)
+	return pieceType, pieceColor
 }
 
 type State struct {

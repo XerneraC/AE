@@ -1,4 +1,6 @@
 package main
+// This file includes all the functions involved in converting between the native type and the string representation of a square
+
 
 import "fmt"
 

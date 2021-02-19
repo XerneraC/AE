@@ -1,5 +1,5 @@
 package main
-
+// This file includes all the functions involved in loading and generating FEN strings
 
 
 var fenPieces = map[byte]Piece{
