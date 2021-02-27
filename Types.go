@@ -94,3 +94,13 @@ type Move struct {
 	from Square
 	to Square
 }
+
+// I might port the entire engine to C once I'm done with it in go.
+// The reason I'm writing it in Go in the first place is since C has
+// no native support for +Inf and -Inf and I hate the workarounds I
+// have to do to achieve the same thing. I also expect the easy
+// concurrency model of Go to come in handy later. What I miss from C
+// the most is the lack of explicit inlining of functions. I hate
+// the fact, that I am at the mercy of the Go compiler when it comes
+// to which functions are inlined and which are not. I hope recognizes
+// small functions well, but I have no idea.

@@ -4,6 +4,7 @@ package main
 import (
 	"math"
 )
+
 //import "fmt"
 
 /*
@@ -78,7 +79,7 @@ var pieceSquares = map[PieceType][64]float64{
 
 // TODO: Completely redo this function.
 // I made it originally, to debug a bug I encountered (which took me 2h and the bug was not even in the part of the code that i was debugging fml).
-// The way it's written wight now is complete dogshit. I'm not even using snake case for the function name. I just didn't care when I wrote this function
+// The way it's written right now is complete dogshit. I'm not even using snake case for the function name. I just didn't care when I wrote this function
 func bestMove(state State, depth int) (Move, float64) {
 	maximizingPlayer := state.turnToMove == White
 	var best Move
@@ -116,11 +117,19 @@ func get_child_nodes(node State) []State {
 //
 // Best wishes
 // Xern
+type cache_entry struct {
+	exploredDepth int
+	value         float64
+}
+var cache = make(map[[64]Piece]cache_entry)
 func α_β_pruning(node State, depth int, α float64, β float64) float64 {
+	if depth == 0 { return evaluate(node) }
+
+	// Check cache
+	cacheEntry := cache[node.board]
+	if cacheEntry.exploredDepth >= depth { return cacheEntry.value }
+
 	maximizingPlayer := node.turnToMove == White
-	if depth == 0 {
-		return evaluate(node)
-	}
 	value := math.Inf(+1)
 	if maximizingPlayer {
 		value = math.Inf(-1)
@@ -138,6 +147,10 @@ func α_β_pruning(node State, depth int, α float64, β float64) float64 {
 			if β <= α { break }
 		}
 	}
+
+	// Update cache
+	cache[node.board] = cache_entry{exploredDepth: depth, value: value}
+
 	return value
 }
 

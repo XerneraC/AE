@@ -2,7 +2,12 @@ package main
 // This is a test file that test the current state of the Engine
 // Nothing here is intended to still be around once the engine is finished (though some parts might be lifted into permanent files later on)
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
 
 
 var asld = map[Piece]rune{
@@ -55,11 +60,11 @@ func visualize_moves(state State, moves []Move) {
 func self_play() {
 	var board State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 	printBoard(board)
-	for i := 0; i <20; i++ {
+	for i := 0; i < 20; i++ {
 
 		fmt.Print("\n")
 		fmt.Println("thinking...")
-		mv, v := bestMove(board, 1)
+		mv, v := bestMove(board, 5)
 		fmt.Println(printMove(mv))
 
 		play_move_on(&board, mv)
@@ -69,19 +74,58 @@ func self_play() {
 }
 
 
+func vs_player(human Color) {
+	var board State = load_fen("3Q2k1/p1N3p1/1p1P3p/n2b3P/8/P2B4/2P2PP1/5RK1 b - - 0 1")
+	printBoard(board)
+	reader := bufio.NewReader(os.Stdin)
+	i := 0
+	if human == White { i = 1 }
+	for true {
+		if i % 2 == 0 {
+			fmt.Print("\n")
+			fmt.Println("thinking...")
+			mv, v := bestMove(board, 6)
+			fmt.Println(printMove(mv))
+
+			play_move_on(&board, mv)
+			printBoard(board)
+			fmt.Println(v)
+		} else {
+			text, _ := reader.ReadString('\n')
+			text = strings.Replace(text, "\n", "", -1)
+			from := coordinate_to_square(text[:2])
+			to := coordinate_to_square(text[2:4])
+			mv := Move{from: from, to: to}
+			fmt.Println(printMove(mv))
+
+			play_move_on(&board, mv)
+			printBoard(board)
+		}
+		i++
+	}
+}
+
 
 func main() {
 	/*
 	//var a State = load_fen("8/8/5K1k/8/6R1/7P/8/8 w - - 5 85")
-	var a State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+	//var a State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+	var a State = load_fen("8/8/8/Q3pq1k/3b4/3b1P2/PP4P1/R1BK4 w - - 1 51")
+
 	printBoard(a)
 	//moves := generate_non_pawn_moves(a, Square{3, 3})
 	fmt.Print("\n")
 	fmt.Println("thinking...")
-	mv, v := bestMove(a, 6)
+	start := time.Now()
+	mv, v := bestMove(a, 5)
+	elapsed := time.Since(start)
 	fmt.Println(printMove(mv))
 	fmt.Println(v)
+	fmt.Printf("Alpha Beta took %s", elapsed)
+	play_move_on(&a, mv)
+	printBoard(a)
 
-	 */
-	self_play()
+	*/
+	//self_play()
+	vs_player(Black)
 }
