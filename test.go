@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 
@@ -75,7 +76,7 @@ func self_play() {
 
 
 func vs_player(human Color) {
-	var board State = load_fen("3Q2k1/p1N3p1/1p1P3p/n2b3P/8/P2B4/2P2PP1/5RK1 b - - 0 1")
+	var board State = load_fen("1rbq1knr/pppp1pbp/2n1p1p1/4P3/2BP1B2/2N2N2/PPP1QPPP/2KR3R b Kk - 0 1")
 	printBoard(board)
 	reader := bufio.NewReader(os.Stdin)
 	i := 0
@@ -84,7 +85,7 @@ func vs_player(human Color) {
 		if i % 2 == 0 {
 			fmt.Print("\n")
 			fmt.Println("thinking...")
-			mv, v := bestMove(board, 6)
+			mv, v := bestMove(board, 5)
 			fmt.Println(printMove(mv))
 
 			play_move_on(&board, mv)
@@ -107,13 +108,15 @@ func vs_player(human Color) {
 
 
 func main() {
-	/*
+
 	//var a State = load_fen("8/8/5K1k/8/6R1/7P/8/8 w - - 5 85")
 	//var a State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-	var a State = load_fen("8/8/8/Q3pq1k/3b4/3b1P2/PP4P1/R1BK4 w - - 1 51")
+	var a State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
 	printBoard(a)
 	//moves := generate_non_pawn_moves(a, Square{3, 3})
+	fmt.Println("All:")
+	visualize_moves(a, generate_all_possible_moves(a))
 	fmt.Print("\n")
 	fmt.Println("thinking...")
 	start := time.Now()
@@ -121,11 +124,12 @@ func main() {
 	elapsed := time.Since(start)
 	fmt.Println(printMove(mv))
 	fmt.Println(v)
-	fmt.Printf("Alpha Beta took %s", elapsed)
+	fmt.Printf("Alpha Beta took %s\n", elapsed)
 	play_move_on(&a, mv)
 	printBoard(a)
+	fmt.Println(a)
 
-	*/
+
 	//self_play()
-	vs_player(Black)
+	//vs_player(Black)
 }

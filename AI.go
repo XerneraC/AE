@@ -77,6 +77,35 @@ var pieceSquares = map[PieceType][64]float64{
 	},
 }
 
+var placeMultiplier = [64]float64{
+	0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
+	0.8, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.8,
+	0.8, 0.7, 0.9, 0.9, 0.9, 0.9, 0.7, 0.8,
+	0.8, 0.7, 0.9, 1.0, 1.0, 0.9, 0.7, 0.8,
+	0.8, 0.7, 0.9, 1.0, 1.0, 0.9, 0.7, 0.8,
+	0.8, 0.7, 0.9, 0.9, 0.9, 0.9, 0.7, 0.8,
+	0.8, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.8,
+	0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
+}
+
+
+func isOver(node State) bool {
+	whiteKingPresent := false
+	blackKingPresent := false
+	for i := 0; i < 64; i++ {
+		switch node.board[i] {
+			case WKing:
+				whiteKingPresent = true
+				break
+			case BKing:
+				blackKingPresent = false
+				break
+		}
+	}
+	return !(whiteKingPresent || blackKingPresent)
+}
+
+
 // TODO: Completely redo this function.
 // I made it originally, to debug a bug I encountered (which took me 2h and the bug was not even in the part of the code that i was debugging fml).
 // The way it's written right now is complete dogshit. I'm not even using snake case for the function name. I just didn't care when I wrote this function
@@ -121,12 +150,13 @@ type cache_entry struct {
 	exploredDepth int
 	value         float64
 }
-var cache = make(map[[64]Piece]cache_entry)
+var cache = make(map[State]cache_entry)
 func α_β_pruning(node State, depth int, α float64, β float64) float64 {
 	if depth == 0 { return evaluate(node) }
+	if isOver(node) { return evaluate(node) }
 
 	// Check cache
-	cacheEntry := cache[node.board]
+	cacheEntry := cache[node]
 	if cacheEntry.exploredDepth >= depth { return cacheEntry.value }
 
 	maximizingPlayer := node.turnToMove == White
@@ -149,7 +179,7 @@ func α_β_pruning(node State, depth int, α float64, β float64) float64 {
 	}
 
 	// Update cache
-	cache[node.board] = cache_entry{exploredDepth: depth, value: value}
+	cache[node] = cache_entry{exploredDepth: depth, value: value}
 
 	return value
 }
@@ -198,11 +228,7 @@ func evaluate(state State) float64 {
 				continue
 		}
 	}
-	if whiteHasKing && !blackHasKing {
-		return math.Inf(+1)
-	} else if !whiteHasKing && blackHasKing {
-		return math.Inf(-1)
-	}
+	if whiteHasKing && !blackHasKing { return math.Inf(+1) } else if !whiteHasKing && blackHasKing { return math.Inf(-1) }
 	return value
 }
 
@@ -220,11 +246,11 @@ func evaluate_PieceSquares(state State) float64 {
 		case White:
 			whiteHasKing = whiteHasKing || (pieceType == King)
  			// This doesn't work really good since it doesn't mirror the maps for Black
-			value += pieceSquares[pieceType][i]
+			value += pieceSquares[pieceType][i] * placeMultiplier[i]
 		case Black:
 			blackHasKing = blackHasKing || (pieceType == King)
   			// This doesn't work really good since it doesn't mirror the maps for Black
-			value -= pieceSquares[pieceType][i]
+			value -= pieceSquares[pieceType][i] * placeMultiplier[i]
 		default:
 			continue
 		}

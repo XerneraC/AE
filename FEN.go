@@ -1,4 +1,5 @@
 package main
+
 // This file includes all the functions involved in loading and generating FEN strings
 
 
@@ -12,6 +13,11 @@ var fenColors = map[byte]Color{
 	'b': Black,
 }
 
+var fenCastlings = map[byte]Castlings{
+	'K': WCastleKingside, 'Q': WCastleQueenside,
+	'k': BCastleKingside, 'q': BCastleQueenside,
+	'-': NoCastling,
+}
 
 func load_fen_advanced(fen string, index *int) State {
 	var loaded State
@@ -38,7 +44,11 @@ func load_fen_advanced(fen string, index *int) State {
 	(*index)++
 	(*index)++
 
-
+	// Loading Castelings
+	loaded.castlings = NoCastling
+	for ;fen[*index] != ' '; (*index)++ {
+		loaded.castlings |= fenCastlings[fen[*index]]
+	}
 
 	return loaded
 }

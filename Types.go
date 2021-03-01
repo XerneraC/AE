@@ -73,7 +73,18 @@ func seperate(piece Piece) (PieceType, Color) {
 type State struct {
 	board [64]Piece
 	turnToMove Color
+
+	castlings Castlings
 }
+
+type Castlings int8; const (
+	NoCastling       Castlings = 0
+	WCastleKingside  Castlings = 1 << 0
+	WCastleQueenside Castlings = 1 << 1
+	BCastleKingside  Castlings = 1 << 2
+	BCastleQueenside Castlings = 1 << 3
+)
+
 
 type Square struct {
 	file int
