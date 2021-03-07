@@ -101,9 +101,39 @@ func square_index(sq Square) int {
 	return (sq.rank << 3) + sq.file
 }
 
+type moveFlags int8; const (
+	StandardMove  moveFlags = 0
+	CastlingMove  moveFlags = 1 << 0
+	EnPassantMove moveFlags = 1 << 1
+	PromotionMove moveFlags = 1 << 2
+)
+
 type Move struct {
 	from Square
 	to Square
+	additionalFlags moveFlags
+}
+
+// to be inlined
+func isMoveCastling(mv Move) bool {
+	return mv.additionalFlags & CastlingMove != 0
+}
+
+// to be inlined
+func isMoveEnPassant(mv Move) bool {
+	return mv.additionalFlags & EnPassantMove != 0
+}
+
+// to be inlined
+// This function could probably be omitted, by just saying "if the
+// promoted pieceType is not NoPiece, it's a promotion"
+func isMovePromotion(mv Move) bool {
+	return mv.additionalFlags & PromotionMove != 0
+}
+
+// to be inlined
+func getPromotedPieceType(mv Move) PieceType {
+	return PieceType(mv.additionalFlags >> 3)
 }
 
 // I might port the entire engine to C once I'm done with it in go.
@@ -115,3 +145,7 @@ type Move struct {
 // the fact, that I am at the mercy of the Go compiler when it comes
 // to which functions are inlined and which are not. I hope recognizes
 // small functions well, but I have no idea.
+
+// Well I've found out +Inf and -Inf DO in fact exist in C (i mean duh,
+// it's C). Only thing remaining is the ease and the memory management
+// (movelists would be a pain).

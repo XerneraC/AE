@@ -1,4 +1,5 @@
 package main
+
 // This file includes the functions involved in generating moves
 
 
@@ -114,17 +115,47 @@ func generate_pawn_moves(state State, from Square) []Move {
 	for _, sq := range walks {
 		if !square_legal(sq) { break }
 		if state.board[square_index(sq)] != NoPiece { break }
-		moves = append(moves, Move{from, sq})
+		moves = append(moves, Move{from: from, to: sq})
 		if !((from.rank == 1) || (from.rank == 6)) { break }
 	}
 	for _, sq := range captures {
 		if !square_legal(sq) { continue }
 		if color_of(state.board[square_index(sq)]) != opposite_color(state.turnToMove) { continue }
-		moves = append(moves, Move{from, sq})
+		moves = append(moves, Move{from: from, to: sq})
 	}
 	return moves
 }
 
+
+func generate_castling_moves(state State) []Move {
+	var moves []Move
+	castling := state.castlings
+	if state.turnToMove == Black { castling = state.castlings >> 2 }
+	rank := 0
+	if state.turnToMove == Black { rank = 7 }
+
+	kingSquare := Square{file: 4, rank: rank}
+
+	if (castling & WCastleKingside) != 0 {
+		firstInTheWay  := state.board[square_index(Square{file: 5, rank: rank})]
+		secondInTheWay := state.board[square_index(Square{file: 6, rank: rank})]
+		if (firstInTheWay == NoPiece) && (secondInTheWay == NoPiece) {
+			newMove := Move{from: kingSquare, to: Square{file: 6, rank: rank}, additionalFlags: CastlingMove}
+			moves = append(moves, newMove)
+		}
+	}
+
+	if (castling & WCastleQueenside) != 0 {
+		firstInTheWay  := state.board[square_index(Square{file: 3, rank: rank})]
+		secondInTheWay := state.board[square_index(Square{file: 2, rank: rank})]
+		thirdInTheWay  := state.board[square_index(Square{file: 1, rank: rank})]
+		if (firstInTheWay == NoPiece) && (secondInTheWay == NoPiece) && (thirdInTheWay == NoPiece) {
+			newMove := Move{from: kingSquare, to: Square{file: 2, rank: rank}, additionalFlags: CastlingMove}
+			moves = append(moves, newMove)
+		}
+	}
+	return moves
+}
 
 
 func generate_moves(state State, from Square) []Move {
@@ -148,6 +179,7 @@ func generate_all_possible_moves(state State) []Move {
 			moves = append(moves, newMoves...)
 		}
 	}
+	moves = append(moves, generate_castling_moves(state)...)
 	return moves
 }
 

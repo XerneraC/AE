@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 )
 
 
@@ -33,6 +32,12 @@ func printBoard(state State) {
 }
 
 func printMove(mv Move) string {
+	if (mv.additionalFlags & CastlingMove) != 0 {
+		if mv.to.file > 4 {
+			return "O-O"
+		}
+		return "O-O-O"
+	}
 	return square_to_coordinate(mv.from) + square_to_coordinate(mv.to)
 }
 
@@ -61,7 +66,8 @@ func visualize_moves(state State, moves []Move) {
 func self_play() {
 	var board State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 	printBoard(board)
-	for i := 0; i < 20; i++ {
+	moves := ""
+	for i := 0; i < 2000; i++ {
 
 		fmt.Print("\n")
 		fmt.Println("thinking...")
@@ -69,14 +75,16 @@ func self_play() {
 		fmt.Println(printMove(mv))
 
 		play_move_on(&board, mv)
+		moves += printMove(mv) + " "
 		printBoard(board)
 		fmt.Println(v)
 	}
+	fmt.Println(moves)
 }
 
 
 func vs_player(human Color) {
-	var board State = load_fen("1rbq1knr/pppp1pbp/2n1p1p1/4P3/2BP1B2/2N2N2/PPP1QPPP/2KR3R b Kk - 0 1")
+	var board State = load_fen("r3k2r/pppppppp/1nbq1bn1/8/8/1NBQ1BN1/PPPPPPPP/R3K2R w KQkq - 0 1")
 	printBoard(board)
 	reader := bufio.NewReader(os.Stdin)
 	i := 0
@@ -94,9 +102,24 @@ func vs_player(human Color) {
 		} else {
 			text, _ := reader.ReadString('\n')
 			text = strings.Replace(text, "\n", "", -1)
-			from := coordinate_to_square(text[:2])
-			to := coordinate_to_square(text[2:4])
-			mv := Move{from: from, to: to}
+			var mv Move
+			if text == "O-O" {
+				rank := 0
+				if board.turnToMove == Black {
+					rank = 7
+				}
+				mv = Move{from: Square{file: 4, rank: rank}, to: Square{file: 6, rank: rank}, additionalFlags: CastlingMove}
+			} else if text == "O-O-O" {
+					rank := 0
+					if board.turnToMove == Black {
+						rank = 7
+					}
+					mv = Move{from: Square{file: 4, rank: rank}, to: Square{file: 2, rank: rank}, additionalFlags: CastlingMove}
+			} else {
+				from := coordinate_to_square(text[:2])
+				to := coordinate_to_square(text[2:4])
+				mv = Move{from: from, to: to}
+			}
 			fmt.Println(printMove(mv))
 
 			play_move_on(&board, mv)
@@ -108,7 +131,7 @@ func vs_player(human Color) {
 
 
 func main() {
-
+/*
 	//var a State = load_fen("8/8/5K1k/8/6R1/7P/8/8 w - - 5 85")
 	//var a State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 	var a State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
@@ -128,8 +151,21 @@ func main() {
 	play_move_on(&a, mv)
 	printBoard(a)
 	fmt.Println(a)
+*/
 
 
-	//self_play()
-	//vs_player(Black)
+	/*
+	var a State = load_fen("rnbqkbnr/pppppppp/8/8/8/1NBQ1BN1/PPPPPPPP/R3K2R w KQkq - 0 1")
+	fmt.Println(a.castlings)
+	printBoard(a)
+	fmt.Print("\n")
+	mv := Move{from: Square{file: 4, rank: 0}, to: Square{file: 2, rank: 0}, additionalFlags: CastlingMove}
+	play_move_on(&a, mv)
+	printBoard(a)
+	printMove(mv)
+	*/
+
+
+	self_play()
+	//vs_player(White)
 }
