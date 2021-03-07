@@ -137,6 +137,10 @@ func getPromotedPieceType(mv Move) PieceType {
 	return PieceType(mv.additionalFlags >> 3)
 }
 
+func makePromotion(pt PieceType) moveFlags {
+	return moveFlags(pt << 3) | PromotionMove
+}
+
 // I might port the entire engine to C once I'm done with it in go.
 // The reason I'm writing it in Go in the first place is since C has
 // no native support for +Inf and -Inf and I hate the workarounds I

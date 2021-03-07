@@ -16,6 +16,15 @@ var asld = map[Piece]rune{
 	WPawn: 'P', WKnight: 'N', WBishop: 'B', WRook: 'R', WQueen: 'Q', WKing: 'K',
 	BPawn: 'p', BKnight: 'n', BBishop: 'b', BRook: 'r', BQueen: 'q', BKing: 'k',
 }
+
+var pts = map[byte]PieceType{
+	'P': Pawn, 'N': Knight, 'B': Bishop, 'R': Rook, 'Q': Queen, 'K': King,
+}
+
+var ptss = map[PieceType]byte{
+	Pawn: 'P', Knight: 'N', Bishop: 'B', Rook: 'R', Queen: 'Q', King: 'K',
+}
+
 /*
 var asld = map[Piece]rune{
 	NoPiece: '.',
@@ -39,7 +48,11 @@ func printMove(mv Move) string {
 		}
 		return "O-O-O"
 	}
-	return square_to_coordinate(mv.from) + square_to_coordinate(mv.to)
+	st := square_to_coordinate(mv.from) + square_to_coordinate(mv.to)
+	if isMovePromotion(mv) {
+		st += "=" + string(ptss[getPromotedPieceType(mv)])
+	}
+	return st
 }
 
 func visualize_moves(state State, moves []Move) {
@@ -85,7 +98,7 @@ func self_play() {
 
 
 func vs_player(human Color) {
-	var board State = load_fen("r3k2r/pppppppp/1nbq1bn1/8/8/1NBQ1BN1/PPPPPPPP/R3K2R w KQkq - 0 1")
+	var board State = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 	printBoard(board)
 	reader := bufio.NewReader(os.Stdin)
 	i := 0
@@ -120,6 +133,12 @@ func vs_player(human Color) {
 				from := coordinate_to_square(text[:2])
 				to := coordinate_to_square(text[2:4])
 				mv = Move{from: from, to: to}
+				if len(text) > 4 {
+					if text[4] == '=' {
+						t := pts[text[5]]
+						mv.additionalFlags = makePromotion(t)
+					}
+				}
 			}
 			fmt.Println(printMove(mv))
 
@@ -167,6 +186,6 @@ func main() {
 	*/
 
 
-	self_play()
-	//vs_player(White)
+	//self_play()
+	vs_player(White)
 }

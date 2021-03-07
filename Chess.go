@@ -13,6 +13,10 @@ func play_move_on(state *State, move Move) {
 	state.board[toIndex] = state.board[fromIndex]
 	state.board[fromIndex] = NoPiece
 
+	if isMovePromotion(move) {
+		state.board[toIndex] = make_piece(getPromotedPieceType(move), state.turnToMove)
+	}
+
 	// This line would be the entire thing for turncoat:
 	// state.board[fromIndex], state.board[toIndex] = state.board[toIndex], state.board[fromIndex]
 
