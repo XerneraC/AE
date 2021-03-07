@@ -1,3 +1,4 @@
+// the Æ chess engine
 package main
 
 // This file includes the functions involved in generating moves
@@ -126,7 +127,7 @@ func generate_pawn_moves(state State, from Square) []Move {
 	return moves
 }
 
-
+// TODO: figure out how UCI handles castling moves
 func generate_castling_moves(state State) []Move {
 	var moves []Move
 	castling := state.castlings

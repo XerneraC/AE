@@ -1,3 +1,4 @@
+// the Æ chess engine
 package main
 // This file includes all the basic types that are used in this package
 

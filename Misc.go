@@ -1,3 +1,4 @@
+// the Æ chess engine
 package main
 
 

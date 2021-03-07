@@ -1,3 +1,4 @@
+// the Æ chess engine
 package main
 // This file includes all the functions that make up the Engine itself
 

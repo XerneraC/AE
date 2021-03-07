@@ -1,3 +1,4 @@
+// the Æ chess engine
 package main
 // This is a test file that test the current state of the Engine
 // Nothing here is intended to still be around once the engine is finished (though some parts might be lifted into permanent files later on)
